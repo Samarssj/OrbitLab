@@ -712,7 +712,7 @@ function setupGUI() {
   const orbitFolder = gui.addFolder("Orbit radii");
   const sizeFolder = gui.addFolder("Planet sizes");
   const galaxyFolder = gui.addFolder("Galaxy controls");
-  galaxyFolder.add(galaxySettings, "rotationSpeed", 0, 0.08, 0.001).name("Spinning speed");
+  galaxyFolder.add(galaxySettings, "rotationSpeed", 0, 1.5, 0.001).name("Spinning speed");
 
   Object.keys(revolutionSpeeds).forEach((planetName) => {
     speedFolder.add(revolutionSpeeds, planetName, 0.001, 10, 0.001);
