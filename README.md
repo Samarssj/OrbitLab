@@ -6,7 +6,7 @@
 [![Built with Three.js](https://img.shields.io/badge/Built%20with-Three.js-000000?logo=three.js&logoColor=white)](https://threejs.org/)
 [![License](https://img.shields.io/badge/License-MIT-8b9cff.svg)](LICENSE)
 
-![OrbitLab Milky Way](img/milky_way_detail.jpg)
+![OrbitLab Milky Way](img/milky_way_coherent.png)
 
 OrbitLab is an interactive 3D Solar System experience built for exploration. It combines textured planets, a bright Sun, a spinning Moon, a prominent asteroid belt, Pluto, elliptical orbital paths, a zoom-triggered Milky Way, and a focused cinema mode in one fluid browser scene.
 
@@ -87,6 +87,7 @@ OrbitLab/
 ├── js/
 │   └── main.js             # Three.js scene, controls, physics-inspired motion
 ├── img/                    # Planet, space, galaxy, and ring textures
+├── ATTRIBUTIONS.md         # License and credit for the sourced galaxy texture
 └── vercel.json             # Static deployment and asset-cache configuration
 ```
 
@@ -101,6 +102,10 @@ OrbitLab/
 
 OrbitLab is designed as an educational and visual exploration rather than a scale-perfect astronomical simulator. Planet diameters are exaggerated so bodies remain readable, while orbital ordering, relative periods, eccentricity, inclination, belt placement, and Pluto’s outer-system position are represented for an intuitive spatial experience.
 
+## Visual asset attribution
+
+The full-galaxy Milky Way texture is **“Milky way.png” by Pablo Carlos Budassi**, adapted from the original image and used under the [Creative Commons Attribution-ShareAlike 4.0 International License](https://creativecommons.org/licenses/by-sa/4.0/). The image license is separate from the MIT License that covers the OrbitLab source code. See [`ATTRIBUTIONS.md`](ATTRIBUTIONS.md) for the source and credit details.
+
 ## License
 
-This project is released under the MIT License. Add a `LICENSE` file before publishing if you want the license badge above to resolve directly in the repository.
+The OrbitLab source code is released under the MIT License.

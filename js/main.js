@@ -54,9 +54,6 @@ let planets = {};
 let asteroidBelt;
 let asteroidOrbits = [];
 let galaxyGroup;
-let galaxyPoints;
-let galaxyBackgroundPoints;
-let galaxyGapPoints;
 let galaxyTexturePlane;
 let galaxyCore;
 let moon;
@@ -213,7 +210,8 @@ function createSunGlow() {
 
 function createMilkyWay() {
   galaxyGroup = new THREE.Group();
-  // Keep the galaxy disc face-on at wide zoom so the full spiral structure reads clearly.
+  // Use one coherent full-galaxy image so every arm and inter-arm region shares
+  // the same natural dust, stars, and color texture.
   galaxyGroup.rotation.x = 0;
   galaxyGroup.rotation.z = THREE.MathUtils.degToRad(-12);
   galaxyGroup.position.y = -90;
@@ -221,128 +219,12 @@ function createMilkyWay() {
   galaxyGroup.renderOrder = -1;
   scene.add(galaxyGroup);
 
-  const starCount = 30000;
-  const positions = new Float32Array(starCount * 3);
-  const colors = new Float32Array(starCount * 3);
-  const palette = [
-    new THREE.Color(0x93aaff),
-    new THREE.Color(0xc6d4ff),
-    new THREE.Color(0xffe3c2),
-    new THREE.Color(0xffffff),
-  ];
-
-  for (let i = 0; i < starCount; i += 1) {
-    const arm = i % 4;
-    const distance = 45 + Math.pow(Math.random(), 0.62) * galaxyConfig.outerRadius;
-    const armAngle = arm * (Math.PI / 2) + distance * 0.0045 + (Math.random() - 0.5) * 0.52;
-    const spread = (Math.random() - 0.5) * (18 + distance * 0.06);
-    const angle = armAngle + spread / Math.max(distance, 1);
-    const thickness = (Math.random() - 0.5) * (5 + distance * 0.012);
-    const index = i * 3;
-    positions[index] = Math.cos(angle) * distance + Math.cos(angle + Math.PI / 2) * spread;
-    positions[index + 1] = thickness;
-    positions[index + 2] = Math.sin(angle) * distance + Math.sin(angle + Math.PI / 2) * spread;
-    const color = palette[Math.floor(Math.random() * palette.length)];
-    colors[index] = color.r;
-    colors[index + 1] = color.g;
-    colors[index + 2] = color.b;
-  }
-
-  const backgroundCount = 100000;
-  const backgroundPositions = new Float32Array(backgroundCount * 3);
-  const backgroundColors = new Float32Array(backgroundCount * 3);
-  for (let i = 0; i < backgroundCount; i += 1) {
-    const distance = 65 + Math.sqrt(Math.random()) * galaxyConfig.outerRadius;
-    const angle = Math.random() * Math.PI * 2;
-    const thickness = (Math.random() - 0.5) * (8 + distance * 0.015);
-    const index = i * 3;
-    backgroundPositions[index] = Math.cos(angle) * distance;
-    backgroundPositions[index + 1] = thickness;
-    backgroundPositions[index + 2] = Math.sin(angle) * distance;
-    const color = palette[Math.floor(Math.random() * palette.length)];
-    backgroundColors[index] = color.r;
-    backgroundColors[index + 1] = color.g;
-    backgroundColors[index + 2] = color.b;
-  }
-  const backgroundGeometry = new THREE.BufferGeometry();
-  backgroundGeometry.setAttribute("position", new THREE.BufferAttribute(backgroundPositions, 3));
-  backgroundGeometry.setAttribute("color", new THREE.BufferAttribute(backgroundColors, 3));
-  galaxyBackgroundPoints = new THREE.Points(
-    backgroundGeometry,
-    new THREE.PointsMaterial({
-      size: 0.9,
-      sizeAttenuation: true,
-      vertexColors: true,
-      transparent: true,
-      opacity: 0.48,
-      depthWrite: false,
-      blending: THREE.AdditiveBlending,
-    })
-  );
-  galaxyBackgroundPoints.renderOrder = -2;
-  galaxyGroup.add(galaxyBackgroundPoints);
-
-  const gapCount = 100000;
-  const gapPositions = new Float32Array(gapCount * 3);
-  const gapColors = new Float32Array(gapCount * 3);
-  for (let i = 0; i < gapCount; i += 1) {
-    const distance = 65 + Math.sqrt(Math.random()) * galaxyConfig.outerRadius;
-    const gapArm = i % 4;
-    const gapAngle = gapArm * (Math.PI / 2) + Math.PI / 4 + distance * 0.0045 + (Math.random() - 0.5) * 0.72;
-    const spread = (Math.random() - 0.5) * (24 + distance * 0.08);
-    const angle = gapAngle + spread / Math.max(distance, 1);
-    const thickness = (Math.random() - 0.5) * (10 + distance * 0.02);
-    const index = i * 3;
-    gapPositions[index] = Math.cos(angle) * distance + Math.cos(angle + Math.PI / 2) * spread;
-    gapPositions[index + 1] = thickness;
-    gapPositions[index + 2] = Math.sin(angle) * distance + Math.sin(angle + Math.PI / 2) * spread;
-    const color = palette[Math.floor(Math.random() * palette.length)];
-    gapColors[index] = color.r;
-    gapColors[index + 1] = color.g;
-    gapColors[index + 2] = color.b;
-  }
-  const gapGeometry = new THREE.BufferGeometry();
-  gapGeometry.setAttribute("position", new THREE.BufferAttribute(gapPositions, 3));
-  gapGeometry.setAttribute("color", new THREE.BufferAttribute(gapColors, 3));
-  galaxyGapPoints = new THREE.Points(
-    gapGeometry,
-    new THREE.PointsMaterial({
-      size: 1.05,
-      sizeAttenuation: true,
-      vertexColors: true,
-      transparent: true,
-      opacity: 0.62,
-      depthWrite: false,
-      blending: THREE.AdditiveBlending,
-    })
-  );
-  galaxyGapPoints.renderOrder = -1;
-  galaxyGroup.add(galaxyGapPoints);
-
-  const geometry = new THREE.BufferGeometry();
-  geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
-  geometry.setAttribute("color", new THREE.BufferAttribute(colors, 3));
-  galaxyPoints = new THREE.Points(
-    geometry,
-    new THREE.PointsMaterial({
-      size: 1.7,
-      sizeAttenuation: true,
-      vertexColors: true,
-      transparent: true,
-      opacity: 0.78,
-      depthWrite: false,
-      blending: THREE.AdditiveBlending,
-    })
-  );
-  galaxyGroup.add(galaxyPoints);
-
   galaxyTexturePlane = new THREE.Mesh(
     new THREE.PlaneGeometry(5200, 5200),
     new THREE.MeshBasicMaterial({
-      map: loadTexture("./img/milky_way_detail.jpg"),
+      map: loadTexture("./img/milky_way_coherent.png"),
       transparent: true,
       opacity: 0,
-      blending: THREE.AdditiveBlending,
       depthWrite: false,
       side: THREE.DoubleSide,
     })
@@ -356,9 +238,9 @@ function createMilkyWay() {
   coreCanvas.height = 256;
   const coreContext = coreCanvas.getContext("2d");
   const coreGradient = coreContext.createRadialGradient(128, 128, 6, 128, 128, 128);
-  coreGradient.addColorStop(0, "rgba(255, 245, 220, 0.95)");
-  coreGradient.addColorStop(0.15, "rgba(255, 210, 159, 0.48)");
-  coreGradient.addColorStop(0.5, "rgba(185, 179, 255, 0.12)");
+  coreGradient.addColorStop(0, "rgba(255, 245, 220, 0.45)");
+  coreGradient.addColorStop(0.2, "rgba(255, 210, 159, 0.18)");
+  coreGradient.addColorStop(0.55, "rgba(185, 179, 255, 0.05)");
   coreGradient.addColorStop(1, "rgba(77, 82, 170, 0)");
   coreContext.fillStyle = coreGradient;
   coreContext.fillRect(0, 0, 256, 256);
@@ -368,7 +250,7 @@ function createMilkyWay() {
       blending: THREE.AdditiveBlending,
       depthWrite: false,
       transparent: true,
-      opacity: 0.8,
+      opacity: 0.34,
     })
   );
   galaxyCore.scale.set(160, 160, 1);
@@ -381,10 +263,7 @@ function updateMilkyWay(cameraDistance, delta) {
   galaxyGroup.visible = reveal > 0.01;
   galaxyGroup.scale.setScalar(0.72 + reveal * 0.28);
   galaxyGroup.position.y = -90 + reveal * 90;
-  galaxyBackgroundPoints.material.opacity = reveal * 0.48;
-  galaxyGapPoints.material.opacity = reveal * 0.62;
-  galaxyPoints.material.opacity = reveal * 0.58;
-  galaxyTexturePlane.material.opacity = reveal * 0.92;
+  galaxyTexturePlane.material.opacity = reveal * 0.98;
   galaxyCore.material.opacity = reveal * 0.8;
   galaxyGroup.rotation.y += delta * 0.018 * reveal;
 }
