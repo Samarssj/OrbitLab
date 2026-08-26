@@ -247,7 +247,7 @@ function createMilkyWay() {
     colors[index + 2] = color.b;
   }
 
-  const backgroundCount = 60000;
+  const backgroundCount = 100000;
   const backgroundPositions = new Float32Array(backgroundCount * 3);
   const backgroundColors = new Float32Array(backgroundCount * 3);
   for (let i = 0; i < backgroundCount; i += 1) {
