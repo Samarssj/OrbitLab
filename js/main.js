@@ -219,7 +219,7 @@ function createMilkyWay() {
   galaxyGroup.renderOrder = -1;
   scene.add(galaxyGroup);
 
-  const starCount = 26000;
+  const starCount = 15000;
   const positions = new Float32Array(starCount * 3);
   const colors = new Float32Array(starCount * 3);
   const palette = [
@@ -308,7 +308,7 @@ function updateMilkyWay(cameraDistance, delta) {
   galaxyGroup.visible = reveal > 0.01;
   galaxyGroup.scale.setScalar(0.72 + reveal * 0.28);
   galaxyGroup.position.y = -90 + reveal * 90;
-  galaxyPoints.material.opacity = reveal * 0.58;
+  galaxyPoints.material.opacity = reveal * 0.36;
   galaxyTexturePlane.material.opacity = reveal * 0.92;
   galaxyCore.material.opacity = reveal * 0.8;
   galaxyGroup.rotation.y += delta * 0.018 * reveal;
@@ -550,18 +550,8 @@ function createAsteroidBelt() {
   asteroidBelt.rotation.y = 0.18;
   scene.add(asteroidBelt);
 
-  [asteroidBeltConfig.innerRadius, (asteroidBeltConfig.innerRadius + asteroidBeltConfig.outerRadius) / 2, asteroidBeltConfig.outerRadius].forEach((radius, index) => {
-    const geometry = new THREE.RingGeometry(radius - 0.04, radius, 128);
-    const material = new THREE.MeshBasicMaterial({
-      color: index === 1 ? 0xc7aa87 : 0x7582aa,
-      transparent: true,
-      opacity: index === 1 ? 0.22 : 0.12,
-      side: THREE.DoubleSide,
-    });
-    const ring = new THREE.Mesh(geometry, material);
-    ring.rotation.x = Math.PI / 2;
-    scene.add(ring);
-  });
+  // The particle belt is the visual guide; omit static guide rings so they
+  // cannot appear to cross the moving Mars or Jupiter meshes.
 }
 
 function updateBodies(elapsed, delta) {
@@ -600,8 +590,16 @@ function updateBodies(elapsed, delta) {
     const localZ = Math.sin(asteroid.angle) * asteroid.radius;
     const worldX = beltCos * localX + beltSin * localZ;
     const worldZ = -beltSin * localX + beltCos * localZ;
-    const marsClear = Math.hypot(worldX - planets.mars.position.x, worldZ - planets.mars.position.z) < 8;
-    const jupiterClear = Math.hypot(worldX - planets.jupiter.position.x, worldZ - planets.jupiter.position.z) < 16;
+    const marsClear = Math.hypot(
+      worldX - planets.mars.position.x,
+      0 - planets.mars.position.y,
+      worldZ - planets.mars.position.z
+    ) < 18;
+    const jupiterClear = Math.hypot(
+      worldX - planets.jupiter.position.x,
+      0 - planets.jupiter.position.y,
+      worldZ - planets.jupiter.position.z
+    ) < 36;
     const cleared = marsClear || jupiterClear;
     asteroidPositions[positionIndex] = cleared ? 10000 : localX;
     asteroidPositions[positionIndex + 1] = cleared ? 10000 : asteroid.inclination + Math.sin(asteroid.angle * 2.7) * 0.12;
