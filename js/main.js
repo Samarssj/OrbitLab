@@ -56,6 +56,7 @@ let asteroidOrbits = [];
 let galaxyGroup;
 let galaxyPoints;
 let galaxyBackgroundPoints;
+let galaxyGapPoints;
 let galaxyTexturePlane;
 let galaxyCore;
 let moon;
@@ -281,6 +282,43 @@ function createMilkyWay() {
   galaxyBackgroundPoints.renderOrder = -2;
   galaxyGroup.add(galaxyBackgroundPoints);
 
+  const gapCount = 100000;
+  const gapPositions = new Float32Array(gapCount * 3);
+  const gapColors = new Float32Array(gapCount * 3);
+  for (let i = 0; i < gapCount; i += 1) {
+    const distance = 65 + Math.sqrt(Math.random()) * galaxyConfig.outerRadius;
+    const gapArm = i % 4;
+    const gapAngle = gapArm * (Math.PI / 2) + Math.PI / 4 + distance * 0.0045 + (Math.random() - 0.5) * 0.72;
+    const spread = (Math.random() - 0.5) * (24 + distance * 0.08);
+    const angle = gapAngle + spread / Math.max(distance, 1);
+    const thickness = (Math.random() - 0.5) * (10 + distance * 0.02);
+    const index = i * 3;
+    gapPositions[index] = Math.cos(angle) * distance + Math.cos(angle + Math.PI / 2) * spread;
+    gapPositions[index + 1] = thickness;
+    gapPositions[index + 2] = Math.sin(angle) * distance + Math.sin(angle + Math.PI / 2) * spread;
+    const color = palette[Math.floor(Math.random() * palette.length)];
+    gapColors[index] = color.r;
+    gapColors[index + 1] = color.g;
+    gapColors[index + 2] = color.b;
+  }
+  const gapGeometry = new THREE.BufferGeometry();
+  gapGeometry.setAttribute("position", new THREE.BufferAttribute(gapPositions, 3));
+  gapGeometry.setAttribute("color", new THREE.BufferAttribute(gapColors, 3));
+  galaxyGapPoints = new THREE.Points(
+    gapGeometry,
+    new THREE.PointsMaterial({
+      size: 1.05,
+      sizeAttenuation: true,
+      vertexColors: true,
+      transparent: true,
+      opacity: 0.62,
+      depthWrite: false,
+      blending: THREE.AdditiveBlending,
+    })
+  );
+  galaxyGapPoints.renderOrder = -1;
+  galaxyGroup.add(galaxyGapPoints);
+
   const geometry = new THREE.BufferGeometry();
   geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
   geometry.setAttribute("color", new THREE.BufferAttribute(colors, 3));
@@ -344,6 +382,7 @@ function updateMilkyWay(cameraDistance, delta) {
   galaxyGroup.scale.setScalar(0.72 + reveal * 0.28);
   galaxyGroup.position.y = -90 + reveal * 90;
   galaxyBackgroundPoints.material.opacity = reveal * 0.48;
+  galaxyGapPoints.material.opacity = reveal * 0.62;
   galaxyPoints.material.opacity = reveal * 0.58;
   galaxyTexturePlane.material.opacity = reveal * 0.92;
   galaxyCore.material.opacity = reveal * 0.8;
