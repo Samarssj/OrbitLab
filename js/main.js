@@ -172,6 +172,7 @@ function createTexturedPlanet(texturePath, radius, options = {}) {
   const texture = loadTexture(texturePath);
   const material = new THREE.MeshStandardMaterial({
     map: texture,
+    color: options.color ?? 0xffffff,
     roughness: options.roughness ?? 0.78,
     metalness: options.metalness ?? 0,
   });
@@ -369,11 +370,12 @@ function init() {
   scene.add(sunLight);
 
   planets.sun = createTexturedPlanet("./img/sun_hd.jpg", planetSizes.sun, {
+    color: 0xffe0aa,
     roughness: 0.5,
-    emissive: 0xffa94f,
+    emissive: 0xffc978,
     emissiveIntensity: 1.8,
   });
-  planets.sun.add(new THREE.PointLight(0xffc16b, 1.6, 260, 2));
+  planets.sun.add(new THREE.PointLight(0xffd39a, 1.6, 260, 2));
   scene.add(planets.sun);
   createSunGlow();
 
