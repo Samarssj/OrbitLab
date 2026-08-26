@@ -1,6 +1,10 @@
 import { GUI } from "https://cdn.skypack.dev/dat.gui";
 import * as THREE from "https://cdn.skypack.dev/three@0.129.0";
 import { OrbitControls } from "https://cdn.skypack.dev/three@0.129.0/examples/jsm/controls/OrbitControls.js";
+import { EffectComposer } from "https://cdn.skypack.dev/three@0.129.0/examples/jsm/postprocessing/EffectComposer.js";
+import { RenderPass } from "https://cdn.skypack.dev/three@0.129.0/examples/jsm/postprocessing/RenderPass.js";
+import { UnrealBloomPass } from "https://cdn.skypack.dev/three@0.129.0/examples/jsm/postprocessing/UnrealBloomPass.js";
+import { SMAAPass } from "https://cdn.skypack.dev/three@0.129.0/examples/jsm/postprocessing/SMAAPass.js";
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
 import {
   doc,
@@ -38,6 +42,9 @@ loadingManager.onError = (url) => {
 let scene;
 let camera;
 let renderer;
+let composer;
+let bloomPass;
+let smaaPass;
 let controls;
 let gui;
 let clock;
@@ -340,6 +347,21 @@ function init() {
   scene.background = loadTexture("./img/deep_space_bg.jpg");
   document.body.appendChild(renderer.domElement);
 
+  const renderScene = new RenderPass(scene, camera);
+  bloomPass = new UnrealBloomPass(
+    new THREE.Vector2(window.innerWidth, window.innerHeight),
+    0.32, // strength
+    0.4,  // radius
+    0.85  // threshold
+  );
+
+  composer = new EffectComposer(renderer);
+  composer.addPass(renderScene);
+  composer.addPass(bloomPass);
+
+  smaaPass = new SMAAPass(window.innerWidth * renderer.getPixelRatio(), window.innerHeight * renderer.getPixelRatio());
+  composer.addPass(smaaPass);
+
   scene.add(new THREE.AmbientLight(0x1b284c, 0.24));
   const sunLight = new THREE.PointLight(0xffd6a0, 4.2, 0, 1.7);
   sunLight.position.set(0, 0, 0);
@@ -604,7 +626,11 @@ function animate() {
   const elapsed = clock.elapsedTime;
   updateBodies(elapsed, delta);
   controls.update();
-  renderer.render(scene, camera);
+  if (composer) {
+    composer.render();
+  } else {
+    renderer.render(scene, camera);
+  }
 }
 
 function setupInterface() {
@@ -814,6 +840,9 @@ function onWindowResize() {
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
   renderer.setSize(window.innerWidth, window.innerHeight);
+  if (composer) {
+    composer.setSize(window.innerWidth, window.innerHeight);
+  }
   updateLabels();
 }
 
