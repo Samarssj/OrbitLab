@@ -626,6 +626,8 @@ function setupInterface() {
 
   document.getElementById("zoom-in").addEventListener("click", () => zoomCamera(0.78));
   document.getElementById("zoom-out").addEventListener("click", () => zoomCamera(1.28));
+  document.getElementById("cinema-zoom-in").addEventListener("click", () => zoomCamera(0.78));
+  document.getElementById("cinema-zoom-out").addEventListener("click", () => zoomCamera(1.28));
 
   document.getElementById("orbits-toggle").addEventListener("click", (event) => {
     simulation.showOrbits = !simulation.showOrbits;

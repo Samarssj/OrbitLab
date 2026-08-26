@@ -615,7 +615,7 @@ body.cinema-mode .app-shell {
 }
 
 body.cinema-mode .app-shell::after,
-body.cinema-mode .app-shell > *:not(#labels):not(#toast):not(#cinema-exit) {
+body.cinema-mode .app-shell > *:not(#labels):not(#toast):not(#cinema-exit):not(.cinema-zoom-overlay) {
   display: none;
 }
 
@@ -663,8 +663,27 @@ body.cinema-mode #toast {
   transform: scale(0.97);
 }
 
+.cinema-zoom-overlay {
+  position: absolute;
+  right: 26px;
+  bottom: 24px;
+  z-index: 4;
+  display: none;
+  gap: 10px;
+  pointer-events: auto;
+}
+
+.cinema-zoom-overlay .zoom-button {
+  width: 48px;
+  min-height: 48px;
+}
+
 body.cinema-mode .cinema-exit {
   display: inline-flex;
+}
+
+body.cinema-mode .cinema-zoom-overlay {
+  display: flex;
 }
 
 @media (max-width: 720px) {
@@ -686,6 +705,19 @@ body.cinema-mode .cinema-exit {
 
   .cinema-exit span {
     font-size: 8px;
+  }
+
+  .cinema-zoom-overlay {
+    bottom: calc(16px + env(safe-area-inset-bottom));
+    right: 16px;
+    gap: 8px;
+  }
+
+  .cinema-zoom-overlay .zoom-button {
+    width: 44px;
+    height: 44px;
+    min-height: 44px;
+    font-size: 20px;
   }
 
   .fullscreen-toggle .fullscreen-icon {
@@ -987,6 +1019,11 @@ body.cinema-mode .cinema-exit {
     min-height: 44px;
     justify-content: center;
     padding: 9px;
+  }
+
+  .cinema-zoom-overlay {
+    bottom: calc(12px + env(safe-area-inset-bottom));
+    right: 12px;
   }
 }
 
