@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#050816" />
+    <title>Solar System // Orbital Lab</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <div class="brand-lockup">
+          <span class="brand-mark" aria-hidden="true"><span></span></span>
+          <div>
+            <p class="eyebrow">ORBITAL LAB / 03</p>
+            <h1>Solar System</h1>
+          </div>
+        </div>
+        <div class="topbar-actions">
+          <button id="fullscreen-toggle" class="fullscreen-toggle" type="button" aria-pressed="false"><span class="fullscreen-icon"></span>Solar system only</button>
+          <div class="topbar-status"><span class="status-dot"></span><span id="status-value">LIVE</span></div>
+        </div>
+      </header>
+
+      <main class="viewport-copy">
+        <p class="kicker">A real-time spatial study</p>
+        <h2>Watch the system<br /><em>find its rhythm.</em></h2>
+        <p class="intro">Drag to orbit. Scroll to zoom. The planets, Moon, and asteroid belt are animated on a smooth, elapsed-time clock.</p>
+      </main>
+
+      <aside class="control-dock" aria-label="Simulation controls">
+        <div class="dock-heading">
+          <span>SIMULATION</span>
+          <span class="mono">01—08</span>
+        </div>
+        <button id="pause-toggle" class="primary-control" type="button">Pause simulation</button>
+        <div class="speed-control">
+          <div class="control-label"><span>Time scale</span><strong id="speed-value">1.0×</strong></div>
+          <input id="speed-slider" type="range" min="0.1" max="3" value="1" step="0.1" aria-label="Simulation time scale" />
+          <div class="range-hints"><span>0.1×</span><span>3.0×</span></div>
+        </div>
+        <div class="zoom-controls" aria-label="Camera zoom controls">
+          <span class="control-label">Camera zoom</span>
+          <div class="zoom-button-row">
+            <button id="zoom-out" class="zoom-button" type="button" aria-label="Zoom out">−</button>
+            <button id="zoom-in" class="zoom-button" type="button" aria-label="Zoom in">+</button>
+          </div>
+        </div>
+        <div class="toggle-grid">
+          <button id="orbits-toggle" class="toggle-chip is-active" type="button"><span class="chip-icon orbit-icon"></span>Orbit paths</button>
+          <button id="asteroids-toggle" class="toggle-chip is-active" type="button"><span class="chip-icon asteroid-icon"></span>Asteroid belt</button>
+          <button id="labels-toggle" class="toggle-chip is-active" type="button"><span class="chip-icon label-icon"></span>Labels</button>
+        </div>
+        <div class="dock-footer">
+          <button id="reset-button" class="text-control reset-control" type="button">Reset defaults</button>
+          <button id="save-button" class="text-control" type="button">Save setup</button>
+          <button id="load-button" class="text-control" type="button">Load setup</button>
+        </div>
+      </aside>
+
+      <div id="tuning-panel" class="tuning-panel" aria-label="Advanced tuning controls"></div>
+      <div id="scene-loader" class="scene-loader" role="status" aria-live="polite">
+        <span class="loader-orbit" aria-hidden="true"></span>
+        <strong>Loading planetary textures</strong>
+        <small>Preparing high-detail view</small>
+      </div>
+      <button id="cinema-exit" class="cinema-exit" type="button">Exit full screen <span>Esc</span></button>
+      <div id="labels" aria-hidden="true"></div>
+      <div id="toast" role="status"></div>
+    </div>
+
+    <script type="module" src="./js/main.js"></script>
+  </body>
+</html>
