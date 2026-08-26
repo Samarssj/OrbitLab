@@ -781,3 +781,246 @@ body.cinema-mode .cinema-exit {
 @media (prefers-reduced-motion: reduce) {
   .loader-orbit { animation-duration: 1.8s; }
 }
+
+/* Mobile-only ergonomics. Desktop rules above remain unchanged. */
+@media (max-width: 720px) {
+  html,
+  body {
+    min-height: 100dvh;
+    height: 100dvh;
+  }
+
+  #c {
+    touch-action: none;
+  }
+
+  .topbar {
+    top: env(safe-area-inset-top);
+    padding: 14px 14px 0;
+  }
+
+  .brand-lockup {
+    gap: 10px;
+  }
+
+  .brand-mark {
+    width: 27px;
+    height: 27px;
+  }
+
+  .brand-mark::before {
+    width: 38px;
+    height: 13px;
+  }
+
+  .brand-mark::after {
+    width: 13px;
+    height: 38px;
+  }
+
+  .brand-mark span {
+    width: 7px;
+    height: 7px;
+  }
+
+  .eyebrow {
+    font-size: 8px;
+  }
+
+  h1 {
+    font-size: 15px;
+  }
+
+  .topbar-actions {
+    gap: 8px;
+  }
+
+  .topbar-status {
+    gap: 7px;
+    font-size: 9px;
+  }
+
+  .fullscreen-toggle {
+    min-width: 42px;
+    min-height: 42px;
+    justify-content: center;
+    padding: 9px;
+  }
+
+  .viewport-copy {
+    top: 15%;
+    left: 14px;
+    width: min(235px, calc(100vw - 28px));
+  }
+
+  .viewport-copy h2 {
+    font-size: clamp(29px, 8.5vw, 36px);
+    line-height: 1;
+  }
+
+  .kicker {
+    margin-bottom: 11px;
+    font-size: 9px;
+  }
+
+  .intro {
+    max-width: 220px;
+    margin-top: 14px;
+    font-size: 10px;
+    line-height: 1.5;
+  }
+
+  .control-dock {
+    right: 12px;
+    bottom: calc(10px + env(safe-area-inset-bottom));
+    left: 12px;
+    max-height: 42dvh;
+    padding: 12px;
+    border-radius: 14px;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y;
+  }
+
+  .dock-heading {
+    margin-bottom: 11px;
+  }
+
+  .primary-control,
+  .zoom-button,
+  .toggle-chip,
+  .text-control {
+    min-height: 44px;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .primary-control {
+    padding: 10px 12px;
+  }
+
+  .speed-control {
+    margin: 14px 0 12px;
+  }
+
+  input[type="range"] {
+    height: 6px;
+    touch-action: pan-x;
+  }
+
+  input[type="range"]::-webkit-slider-thumb {
+    width: 20px;
+    height: 20px;
+  }
+
+  .zoom-controls {
+    gap: 7px;
+    margin-top: 12px;
+  }
+
+  .zoom-button-row {
+    gap: 7px;
+  }
+
+  .zoom-button {
+    min-height: 48px;
+  }
+
+  .toggle-grid {
+    gap: 7px;
+    margin-top: 12px;
+  }
+
+  .toggle-chip {
+    gap: 8px;
+    padding: 9px 8px;
+  }
+
+  .dock-footer {
+    justify-content: space-between;
+    gap: 4px;
+    margin-top: 12px;
+    padding-top: 10px;
+  }
+
+  .text-control {
+    padding: 4px 5px;
+    font-size: 8px;
+  }
+
+  .tuning-panel {
+    top: 65px;
+    right: 12px;
+    left: auto;
+    width: 240px;
+    max-width: calc(100vw - 24px);
+    max-height: 35dvh;
+    overflow: auto;
+    overscroll-behavior: contain;
+    touch-action: pan-x pan-y;
+  }
+
+  .tuning-panel .dg.main {
+    width: min(240px, calc(100vw - 24px)) !important;
+  }
+
+  .planet-label {
+    max-width: 104px;
+    padding: 4px 5px;
+    overflow: hidden;
+    font-size: 7px;
+    text-overflow: ellipsis;
+  }
+
+  #toast {
+    top: calc(62px + env(safe-area-inset-top));
+    right: 12px;
+    left: 12px;
+    max-width: none;
+    text-align: center;
+  }
+
+  .cinema-exit {
+    top: calc(12px + env(safe-area-inset-top));
+    right: 12px;
+    min-width: 44px;
+    min-height: 44px;
+    justify-content: center;
+    padding: 9px;
+  }
+}
+
+@media (max-width: 380px) {
+  .topbar-status {
+    display: none;
+  }
+
+  .viewport-copy {
+    top: 14%;
+    width: min(214px, calc(100vw - 28px));
+  }
+
+  .viewport-copy h2 {
+    font-size: 29px;
+  }
+
+  .intro {
+    max-width: 204px;
+    font-size: 9px;
+  }
+
+  .control-dock {
+    max-height: 45dvh;
+  }
+
+  .dock-footer {
+    gap: 1px;
+  }
+
+  .text-control {
+    padding-right: 3px;
+    padding-left: 3px;
+    font-size: 7px;
+  }
+}

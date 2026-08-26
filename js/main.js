@@ -726,7 +726,9 @@ function setupGUI() {
     orbitFolder.add(orbitRadii, planetName, 40, 3200, 1).onChange((value) => updateOrbit(planetName, value));
     sizeFolder.add(planetSizes, planetName, 0.4, 15, 0.1).onChange((value) => resizePlanet(planetName, value));
   });
-  speedFolder.open();
+  if (window.innerWidth > 720) {
+    speedFolder.open();
+  }
 }
 
 function updateOrbit(planetName, radius) {
