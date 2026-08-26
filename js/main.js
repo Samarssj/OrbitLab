@@ -66,10 +66,10 @@ const orbitRadii = {
   venus: 60,
   earth: 70,
   mars: 80,
-  jupiter: 100,
-  saturn: 120,
-  uranus: 140,
-  neptune: 160,
+  jupiter: 120,
+  saturn: 155,
+  uranus: 190,
+  neptune: 225,
   // Earth is 1 AU = 70 scene units; Pluto averages 39.48 AU.
   pluto: 2764,
 };
@@ -140,8 +140,8 @@ const simulation = {
   showLabels: true,
 };
 
-// In this scene's visual scale, Mars is at 80 and Jupiter at 100.
-// The main belt is kept in the physical gap, with clearance for both planet meshes.
+// The outer planets are deliberately spaced farther apart for clear visual separation.
+// The continuous main belt sits between Mars and the widened Jupiter orbit.
 const galaxyConfig = {
   revealStart: 900,
   fullReveal: 2600,
@@ -150,10 +150,10 @@ const galaxyConfig = {
 
 const asteroidBeltConfig = {
   // Mars reaches roughly 87.5 scene units at aphelion in this visual scale.
-  // Keep the belt beyond that ellipse while remaining just inside Jupiter.
-  innerRadius: 91.5,
-  outerRadius: 93.5,
-  referenceRadius: 92.5,
+  // The widened corridor keeps the continuous belt clear of Mars and Jupiter.
+  innerRadius: 96,
+  outerRadius: 100,
+  referenceRadius: 98,
 };
 
 function loadTexture(path) {
