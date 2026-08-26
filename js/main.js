@@ -149,11 +149,11 @@ const galaxyConfig = {
 };
 
 const asteroidBeltConfig = {
-  // The belt sits in the safe 85–87 corridor: beyond Mars’s visible edge
-  // and inside Jupiter’s visible edge, without crossing either path.
-  innerRadius: 85,
-  outerRadius: 87,
-  referenceRadius: 86,
+  // Mars reaches roughly 87.5 scene units at aphelion in this visual scale.
+  // Keep the belt beyond that ellipse while remaining just inside Jupiter.
+  innerRadius: 91.5,
+  outerRadius: 93.5,
+  referenceRadius: 92.5,
 };
 
 function loadTexture(path) {
@@ -219,7 +219,7 @@ function createMilkyWay() {
   galaxyGroup.renderOrder = -1;
   scene.add(galaxyGroup);
 
-  const starCount = 15000;
+  const starCount = 26000;
   const positions = new Float32Array(starCount * 3);
   const colors = new Float32Array(starCount * 3);
   const palette = [
@@ -308,7 +308,7 @@ function updateMilkyWay(cameraDistance, delta) {
   galaxyGroup.visible = reveal > 0.01;
   galaxyGroup.scale.setScalar(0.72 + reveal * 0.28);
   galaxyGroup.position.y = -90 + reveal * 90;
-  galaxyPoints.material.opacity = reveal * 0.36;
+  galaxyPoints.material.opacity = reveal * 0.58;
   galaxyTexturePlane.material.opacity = reveal * 0.92;
   galaxyCore.material.opacity = reveal * 0.8;
   galaxyGroup.rotation.y += delta * 0.018 * reveal;
@@ -382,7 +382,10 @@ function init() {
   Object.keys(orbitRadii).forEach((planetName) => {
     planets[planetName] = createTexturedPlanet(
       `./img/${planetName}_hd.jpg`,
-      planetSizes[planetName]
+      planetSizes[planetName],
+      planetName === "jupiter"
+        ? { emissive: 0x2b241b, emissiveIntensity: 0.42 }
+        : {}
     );
     planets[planetName].castShadow = true;
     planets[planetName].receiveShadow = true;
@@ -587,12 +590,22 @@ function updateBodies(elapsed, delta) {
   moon.rotation.y += delta * 0.34 * simulation.timeScale;
 
   const asteroidPositions = asteroidBelt.geometry.attributes.position.array;
+  const beltRotation = asteroidBelt.rotation.y;
+  const beltCos = Math.cos(beltRotation);
+  const beltSin = Math.sin(beltRotation);
   asteroidOrbits.forEach((asteroid, index) => {
     asteroid.angle += delta * asteroid.orbitalRate * simulation.timeScale;
     const positionIndex = index * 3;
-    asteroidPositions[positionIndex] = Math.cos(asteroid.angle) * asteroid.radius;
-    asteroidPositions[positionIndex + 1] = asteroid.inclination + Math.sin(asteroid.angle * 2.7) * 0.12;
-    asteroidPositions[positionIndex + 2] = Math.sin(asteroid.angle) * asteroid.radius;
+    const localX = Math.cos(asteroid.angle) * asteroid.radius;
+    const localZ = Math.sin(asteroid.angle) * asteroid.radius;
+    const worldX = beltCos * localX + beltSin * localZ;
+    const worldZ = -beltSin * localX + beltCos * localZ;
+    const marsClear = Math.hypot(worldX - planets.mars.position.x, worldZ - planets.mars.position.z) < 8;
+    const jupiterClear = Math.hypot(worldX - planets.jupiter.position.x, worldZ - planets.jupiter.position.z) < 16;
+    const cleared = marsClear || jupiterClear;
+    asteroidPositions[positionIndex] = cleared ? 10000 : localX;
+    asteroidPositions[positionIndex + 1] = cleared ? 10000 : asteroid.inclination + Math.sin(asteroid.angle * 2.7) * 0.12;
+    asteroidPositions[positionIndex + 2] = cleared ? 10000 : localZ;
   });
   asteroidBelt.geometry.attributes.position.needsUpdate = true;
   updateLabels();
