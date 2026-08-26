@@ -48,6 +48,8 @@ button {
   width: 100%;
   height: 100%;
   outline: none;
+  touch-action: none;
+  overscroll-behavior: none;
 }
 
 .app-shell {
@@ -790,9 +792,6 @@ body.cinema-mode .cinema-exit {
     height: 100dvh;
   }
 
-  #c {
-    touch-action: none;
-  }
 
   .topbar {
     top: env(safe-area-inset-top);

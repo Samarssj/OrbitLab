@@ -382,6 +382,10 @@ function init() {
   controls.minDistance = 24;
   controls.maxDistance = 4200;
   controls.target.set(0, 0, 0);
+  document.addEventListener("wheel", preventBrowserZoom, { passive: false, capture: true });
+  document.addEventListener("gesturestart", preventBrowserZoom, { passive: false, capture: true });
+  document.addEventListener("gesturechange", preventBrowserZoom, { passive: false, capture: true });
+  document.addEventListener("gestureend", preventBrowserZoom, { passive: false, capture: true });
 
   clock = new THREE.Clock();
   window.addEventListener("resize", onWindowResize);
@@ -699,6 +703,11 @@ function resetDefaults() {
   Object.entries(orbitRadii).forEach(([planetName, radius]) => updateOrbit(planetName, radius));
   Object.entries(planetSizes).forEach(([planetName, size]) => resizePlanet(planetName, size));
   showToast("Default simulation restored");
+}
+
+function preventBrowserZoom(event) {
+  if (event.type === "wheel" && !event.ctrlKey) return;
+  event.preventDefault();
 }
 
 function zoomCamera(multiplier) {
