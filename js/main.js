@@ -55,6 +55,7 @@ let asteroidBelt;
 let asteroidOrbits = [];
 let galaxyGroup;
 let galaxyPoints;
+let galaxyBackgroundPoints;
 let galaxyTexturePlane;
 let galaxyCore;
 let moon;
@@ -246,6 +247,40 @@ function createMilkyWay() {
     colors[index + 2] = color.b;
   }
 
+  const backgroundCount = 50000;
+  const backgroundPositions = new Float32Array(backgroundCount * 3);
+  const backgroundColors = new Float32Array(backgroundCount * 3);
+  for (let i = 0; i < backgroundCount; i += 1) {
+    const distance = 65 + Math.sqrt(Math.random()) * galaxyConfig.outerRadius;
+    const angle = Math.random() * Math.PI * 2;
+    const thickness = (Math.random() - 0.5) * (8 + distance * 0.015);
+    const index = i * 3;
+    backgroundPositions[index] = Math.cos(angle) * distance;
+    backgroundPositions[index + 1] = thickness;
+    backgroundPositions[index + 2] = Math.sin(angle) * distance;
+    const color = palette[Math.floor(Math.random() * palette.length)];
+    backgroundColors[index] = color.r;
+    backgroundColors[index + 1] = color.g;
+    backgroundColors[index + 2] = color.b;
+  }
+  const backgroundGeometry = new THREE.BufferGeometry();
+  backgroundGeometry.setAttribute("position", new THREE.BufferAttribute(backgroundPositions, 3));
+  backgroundGeometry.setAttribute("color", new THREE.BufferAttribute(backgroundColors, 3));
+  galaxyBackgroundPoints = new THREE.Points(
+    backgroundGeometry,
+    new THREE.PointsMaterial({
+      size: 0.9,
+      sizeAttenuation: true,
+      vertexColors: true,
+      transparent: true,
+      opacity: 0.48,
+      depthWrite: false,
+      blending: THREE.AdditiveBlending,
+    })
+  );
+  galaxyBackgroundPoints.renderOrder = -2;
+  galaxyGroup.add(galaxyBackgroundPoints);
+
   const geometry = new THREE.BufferGeometry();
   geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
   geometry.setAttribute("color", new THREE.BufferAttribute(colors, 3));
@@ -308,6 +343,7 @@ function updateMilkyWay(cameraDistance, delta) {
   galaxyGroup.visible = reveal > 0.01;
   galaxyGroup.scale.setScalar(0.72 + reveal * 0.28);
   galaxyGroup.position.y = -90 + reveal * 90;
+  galaxyBackgroundPoints.material.opacity = reveal * 0.48;
   galaxyPoints.material.opacity = reveal * 0.58;
   galaxyTexturePlane.material.opacity = reveal * 0.92;
   galaxyCore.material.opacity = reveal * 0.8;
