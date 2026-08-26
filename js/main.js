@@ -219,7 +219,7 @@ function createMilkyWay() {
   galaxyGroup.renderOrder = -1;
   scene.add(galaxyGroup);
 
-  const starCount = 15000;
+  const starCount = 30000;
   const positions = new Float32Array(starCount * 3);
   const colors = new Float32Array(starCount * 3);
   const palette = [
@@ -308,7 +308,7 @@ function updateMilkyWay(cameraDistance, delta) {
   galaxyGroup.visible = reveal > 0.01;
   galaxyGroup.scale.setScalar(0.72 + reveal * 0.28);
   galaxyGroup.position.y = -90 + reveal * 90;
-  galaxyPoints.material.opacity = reveal * 0.36;
+  galaxyPoints.material.opacity = reveal * 0.58;
   galaxyTexturePlane.material.opacity = reveal * 0.92;
   galaxyCore.material.opacity = reveal * 0.8;
   galaxyGroup.rotation.y += delta * 0.018 * reveal;
@@ -580,30 +580,12 @@ function updateBodies(elapsed, delta) {
   moon.rotation.y += delta * 0.34 * simulation.timeScale;
 
   const asteroidPositions = asteroidBelt.geometry.attributes.position.array;
-  const beltRotation = asteroidBelt.rotation.y;
-  const beltCos = Math.cos(beltRotation);
-  const beltSin = Math.sin(beltRotation);
   asteroidOrbits.forEach((asteroid, index) => {
     asteroid.angle += delta * asteroid.orbitalRate * simulation.timeScale;
     const positionIndex = index * 3;
-    const localX = Math.cos(asteroid.angle) * asteroid.radius;
-    const localZ = Math.sin(asteroid.angle) * asteroid.radius;
-    const worldX = beltCos * localX + beltSin * localZ;
-    const worldZ = -beltSin * localX + beltCos * localZ;
-    const marsClear = Math.hypot(
-      worldX - planets.mars.position.x,
-      0 - planets.mars.position.y,
-      worldZ - planets.mars.position.z
-    ) < 18;
-    const jupiterClear = Math.hypot(
-      worldX - planets.jupiter.position.x,
-      0 - planets.jupiter.position.y,
-      worldZ - planets.jupiter.position.z
-    ) < 36;
-    const cleared = marsClear || jupiterClear;
-    asteroidPositions[positionIndex] = cleared ? 10000 : localX;
-    asteroidPositions[positionIndex + 1] = cleared ? 10000 : asteroid.inclination + Math.sin(asteroid.angle * 2.7) * 0.12;
-    asteroidPositions[positionIndex + 2] = cleared ? 10000 : localZ;
+    asteroidPositions[positionIndex] = Math.cos(asteroid.angle) * asteroid.radius;
+    asteroidPositions[positionIndex + 1] = asteroid.inclination + Math.sin(asteroid.angle * 2.7) * 0.12;
+    asteroidPositions[positionIndex + 2] = Math.sin(asteroid.angle) * asteroid.radius;
   });
   asteroidBelt.geometry.attributes.position.needsUpdate = true;
   updateLabels();
