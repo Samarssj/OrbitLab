@@ -69,8 +69,8 @@ const orbitRadii = {
   saturn: 155,
   uranus: 190,
   neptune: 225,
-  // Earth is 1 AU = 70 scene units; Pluto averages 39.48 AU.
-  pluto: 2764,
+  // Pluto is placed just beyond Neptune so it remains inside the visible system.
+  pluto: 260,
 };
 
 // Real relative orbital rates, normalized to Mercury = 10.
@@ -98,7 +98,7 @@ const planetSizes = {
   saturn: 8,
   uranus: 6,
   neptune: 5,
-  pluto: 0.9,
+  pluto: 2.2,
 };
 
 const orbitalElements = {
@@ -343,7 +343,9 @@ function init() {
       planetSizes[planetName],
       planetName === "jupiter"
         ? { emissive: 0x2b241b, emissiveIntensity: 0.42 }
-        : {}
+        : planetName === "pluto"
+          ? { color: 0xb39a87, emissive: 0x3b2a24, emissiveIntensity: 0.38 }
+          : {}
     );
     planets[planetName].castShadow = true;
     planets[planetName].receiveShadow = true;
