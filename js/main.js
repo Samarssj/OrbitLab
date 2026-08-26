@@ -139,6 +139,10 @@ const simulation = {
   showLabels: true,
 };
 
+const galaxySettings = {
+  rotationSpeed: 0.018,
+};
+
 // The outer planets are deliberately spaced farther apart for clear visual separation.
 // The continuous main belt sits between Mars and the widened Jupiter orbit.
 const galaxyConfig = {
@@ -265,7 +269,7 @@ function updateMilkyWay(cameraDistance, delta) {
   galaxyGroup.position.y = -90 + reveal * 90;
   galaxyTexturePlane.material.opacity = reveal * 0.98;
   galaxyCore.material.opacity = reveal * 0.8;
-  galaxyGroup.rotation.y += delta * 0.018 * reveal;
+  galaxyGroup.rotation.y += delta * simulation.timeScale * galaxySettings.rotationSpeed * reveal;
 }
 
 
@@ -676,6 +680,7 @@ function resetDefaults() {
   Object.assign(orbitRadii, defaultPresets.orbitRadii);
   Object.assign(revolutionSpeeds, defaultPresets.revolutionSpeeds);
   Object.assign(planetSizes, defaultPresets.planetSizes);
+  galaxySettings.rotationSpeed = 0.018;
   updateGUIControls();
   Object.entries(orbitRadii).forEach(([planetName, radius]) => updateOrbit(planetName, radius));
   Object.entries(planetSizes).forEach(([planetName, size]) => resizePlanet(planetName, size));
@@ -706,6 +711,8 @@ function setupGUI() {
   const speedFolder = gui.addFolder("Revolution speeds");
   const orbitFolder = gui.addFolder("Orbit radii");
   const sizeFolder = gui.addFolder("Planet sizes");
+  const galaxyFolder = gui.addFolder("Galaxy controls");
+  galaxyFolder.add(galaxySettings, "rotationSpeed", 0, 0.08, 0.001).name("Spinning speed");
 
   Object.keys(revolutionSpeeds).forEach((planetName) => {
     speedFolder.add(revolutionSpeeds, planetName, 0.001, 10, 0.001);
@@ -737,6 +744,7 @@ function updateGUIControls() {
     gui.__folders["Orbit radii"].__controllers.find((controller) => controller.property === planetName).setValue(orbitRadii[planetName]);
     gui.__folders["Planet sizes"].__controllers.find((controller) => controller.property === planetName).setValue(planetSizes[planetName]);
   });
+  gui.__folders["Galaxy controls"].__controllers.find((controller) => controller.property === "rotationSpeed").setValue(galaxySettings.rotationSpeed);
 }
 
 async function saveToFirebase() {
@@ -745,6 +753,7 @@ async function saveToFirebase() {
       orbitRadii,
       revolutionSpeeds,
       planetSizes,
+      galaxySettings,
     });
     showToast("Simulation settings saved");
   } catch (error) {
@@ -761,6 +770,7 @@ async function loadFromFirebase() {
       Object.assign(orbitRadii, data.orbitRadii || {});
       Object.assign(revolutionSpeeds, data.revolutionSpeeds || {});
       Object.assign(planetSizes, data.planetSizes || {});
+      Object.assign(galaxySettings, data.galaxySettings || {});
       updateGUIControls();
       showToast("Simulation settings loaded");
     } else {

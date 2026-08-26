@@ -29,8 +29,9 @@ OrbitLab is an interactive 3D Solar System experience built for exploration. It 
 | Control | Behavior |
 | --- | --- |
 | **Pause simulation** | Stops or resumes the elapsed-time animation. |
-| **Time scale** | Applies a global multiplier to the motion of planets, Moon, and asteroids. |
+| **Time scale** | Applies a global multiplier to the motion of planets, Moon, asteroids, and the Milky Way rotation. |
 | **Zoom − / +** | Moves the camera out or in using the same limits as scroll and touch zoom. |
+| **Galaxy spinning speed** | Adjusts the Milky Way’s base rotation speed independently; the global time scale also multiplies it. |
 | **Orbit paths** | Shows or hides the elliptical orbital paths. Enabled by default. |
 | **Asteroid belt** | Shows or hides the animated belt. |
 | **Labels** | Shows or hides object labels. |
