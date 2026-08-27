@@ -56,6 +56,10 @@ let asteroidOrbits = [];
 let galaxyGroup;
 let galaxyTexturePlane;
 let galaxyCore;
+let andromedaGroup;
+let andromedaTexturePlane;
+let andromedaCore;
+let spaceDetailsGroup;
 let moon;
 let moonOrbit;
 let statusValue;
@@ -151,6 +155,12 @@ const galaxyConfig = {
   outerRadius: 2200,
 };
 
+const andromedaConfig = {
+  revealStart: 2200,
+  fullReveal: 3600,
+  position: new THREE.Vector3(1500, 420, -1050),
+};
+
 const asteroidBeltConfig = {
   // Mars reaches roughly 87.5 scene units at aphelion in this visual scale.
   // The widened corridor keeps the continuous belt clear of Mars and Jupiter.
@@ -212,6 +222,114 @@ function createSunGlow() {
   planets.sun.add(glow);
 }
 
+function createSpaceDetails() {
+  spaceDetailsGroup = new THREE.Group();
+  spaceDetailsGroup.renderOrder = 2;
+  scene.add(spaceDetailsGroup);
+
+  const starCount = 2400;
+  const starPositions = new Float32Array(starCount * 3);
+  const starColors = new Float32Array(starCount * 3);
+  const starPalette = [
+    new THREE.Color(0xdde8ff),
+    new THREE.Color(0xffffff),
+    new THREE.Color(0xffe0b2),
+    new THREE.Color(0xaec8ff),
+  ];
+  let seed = 713;
+  const random = () => {
+    seed = (seed * 1664525 + 1013904223) % 4294967296;
+    return seed / 4294967296;
+  };
+
+  for (let index = 0; index < starCount; index += 1) {
+    const azimuth = random() * Math.PI * 2;
+    const vertical = random() * 2 - 1;
+    const radial = Math.sqrt(1 - vertical * vertical);
+    const radius = 760 + Math.cbrt(random()) * 2050;
+    const offset = index * 3;
+    starPositions[offset] = Math.cos(azimuth) * radial * radius;
+    starPositions[offset + 1] = vertical * radius;
+    starPositions[offset + 2] = Math.sin(azimuth) * radial * radius;
+    const color = starPalette[Math.floor(random() * starPalette.length)];
+    starColors[offset] = color.r;
+    starColors[offset + 1] = color.g;
+    starColors[offset + 2] = color.b;
+  }
+
+  const starsGeometry = new THREE.BufferGeometry();
+  starsGeometry.setAttribute("position", new THREE.BufferAttribute(starPositions, 3));
+  starsGeometry.setAttribute("color", new THREE.BufferAttribute(starColors, 3));
+  const stars = new THREE.Points(
+    starsGeometry,
+    new THREE.PointsMaterial({
+      size: 2.1,
+      sizeAttenuation: false,
+      vertexColors: true,
+      transparent: true,
+      opacity: 0.68,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+    })
+  );
+  spaceDetailsGroup.add(stars);
+
+  // A compact far-sky pattern: constellation stars are an angular
+  // line-of-sight grouping, not a structure larger than the solar system.
+  const constellationPoints = [
+    [-140, 55, -180],
+    [-100, 62, -230],
+    [-30, 48, -202],
+    [42, 58, -264],
+    [112, 52, -208],
+    [154, 60, -236],
+  ];
+  const constellationPositions = new Float32Array(constellationPoints.flat());
+  const constellationGeometry = new THREE.BufferGeometry();
+  constellationGeometry.setAttribute(
+    "position",
+    new THREE.BufferAttribute(constellationPositions, 3)
+  );
+  const constellationStars = new THREE.Points(
+    constellationGeometry,
+    new THREE.PointsMaterial({
+      color: 0xffe7bd,
+      size: 3.6,
+      sizeAttenuation: false,
+      transparent: true,
+      opacity: 0.9,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+      depthTest: false,
+    })
+  );
+  spaceDetailsGroup.add(constellationStars);
+
+  const constellationLinePositions = new Float32Array(
+    constellationPoints.slice(0, -1).flatMap((point, index) => [
+      ...point,
+      ...constellationPoints[index + 1],
+    ])
+  );
+  const constellationLineGeometry = new THREE.BufferGeometry();
+  constellationLineGeometry.setAttribute(
+    "position",
+    new THREE.BufferAttribute(constellationLinePositions, 3)
+  );
+  const constellationLines = new THREE.LineSegments(
+    constellationLineGeometry,
+    new THREE.LineBasicMaterial({
+      color: 0x8fa7cf,
+      transparent: true,
+      opacity: 0.34,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+      depthTest: false,
+    })
+  );
+  spaceDetailsGroup.add(constellationLines);
+}
+
 function createMilkyWay() {
   galaxyGroup = new THREE.Group();
   // Use one coherent full-galaxy image so every arm and inter-arm region shares
@@ -259,6 +377,64 @@ function createMilkyWay() {
   );
   galaxyCore.scale.set(160, 160, 1);
   galaxyGroup.add(galaxyCore);
+}
+
+function createAndromeda() {
+  andromedaGroup = new THREE.Group();
+  andromedaGroup.position.copy(andromedaConfig.position);
+  andromedaGroup.rotation.z = THREE.MathUtils.degToRad(12);
+  andromedaGroup.visible = false;
+  andromedaGroup.renderOrder = 1;
+  scene.add(andromedaGroup);
+
+  andromedaTexturePlane = new THREE.Sprite(
+    new THREE.SpriteMaterial({
+      map: loadTexture("./img/andromeda_m31.png"),
+      transparent: true,
+      opacity: 0,
+      depthWrite: false,
+      depthTest: false,
+      blending: THREE.AdditiveBlending,
+    })
+  );
+  andromedaTexturePlane.scale.set(850, 478, 1);
+  andromedaGroup.add(andromedaTexturePlane);
+
+  const coreCanvas = document.createElement("canvas");
+  coreCanvas.width = 256;
+  coreCanvas.height = 256;
+  const coreContext = coreCanvas.getContext("2d");
+  const coreGradient = coreContext.createRadialGradient(128, 128, 8, 128, 128, 128);
+  coreGradient.addColorStop(0, "rgba(255, 241, 205, 0.55)");
+  coreGradient.addColorStop(0.18, "rgba(255, 206, 145, 0.22)");
+  coreGradient.addColorStop(0.58, "rgba(142, 164, 255, 0.06)");
+  coreGradient.addColorStop(1, "rgba(70, 83, 170, 0)");
+  coreContext.fillStyle = coreGradient;
+  coreContext.fillRect(0, 0, 256, 256);
+  andromedaCore = new THREE.Sprite(
+    new THREE.SpriteMaterial({
+      map: new THREE.CanvasTexture(coreCanvas),
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+      depthTest: false,
+      transparent: true,
+      opacity: 0,
+    })
+  );
+  andromedaCore.position.set(-42, 2, 8);
+  andromedaCore.scale.set(190, 190, 1);
+  andromedaGroup.add(andromedaCore);
+}
+
+function updateAndromeda(cameraDistance) {
+  const reveal = THREE.MathUtils.smoothstep(
+    cameraDistance,
+    andromedaConfig.revealStart,
+    andromedaConfig.fullReveal
+  );
+  andromedaGroup.visible = reveal > 0.01;
+  andromedaTexturePlane.material.opacity = reveal * 0.9;
+  andromedaCore.material.opacity = reveal * 0.72;
 }
 
 function updateMilkyWay(cameraDistance, delta) {
@@ -357,8 +533,10 @@ function init() {
   createSaturnRings();
   createMoon();
   createOrbits();
+  createSpaceDetails();
   createAsteroidBelt();
   createMilkyWay();
+  createAndromeda();
   setupInterface();
 
   controls = new OrbitControls(camera, renderer.domElement);
@@ -517,6 +695,7 @@ function createAsteroidBelt() {
 function updateBodies(elapsed, delta) {
   const cameraDistance = camera.position.distanceTo(controls.target);
   updateMilkyWay(cameraDistance, simulation.running ? delta : 0);
+  updateAndromeda(cameraDistance);
   if (!simulation.running) return;
   const scaledTime = elapsed * simulation.timeScale;
   const motionScale = 0.09;
