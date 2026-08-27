@@ -147,6 +147,10 @@ const galaxySettings = {
   rotationSpeed: 0.018,
 };
 
+const asteroidBeltSettings = {
+  speedMultiplier: 1,
+};
+
 // The outer planets are deliberately spaced farther apart for clear visual separation.
 // The continuous main belt sits between Mars and the widened Jupiter orbit.
 const galaxyConfig = {
@@ -660,6 +664,8 @@ function createAsteroidBelt() {
     const radius = asteroidBeltConfig.innerRadius + Math.random() * (asteroidBeltConfig.outerRadius - asteroidBeltConfig.innerRadius);
     const inclination = (Math.random() - 0.5) * 0.9;
     const index = i * 3;
+    // Keplerian mean motion: n ∝ a^(-3/2), so inner-belt asteroids
+    // complete their orbits faster than outer-belt asteroids.
     const orbitalRate = Math.pow(asteroidBeltConfig.referenceRadius / radius, 1.5) * 0.46;
     asteroidOrbits.push({ angle, radius, inclination, orbitalRate });
     positions[index] = Math.cos(angle) * radius;
@@ -720,7 +726,10 @@ function updateBodies(elapsed, delta) {
 
   const asteroidPositions = asteroidBelt.geometry.attributes.position.array;
   asteroidOrbits.forEach((asteroid, index) => {
-    asteroid.angle += delta * asteroid.orbitalRate * simulation.timeScale;
+    asteroid.angle += delta
+      * asteroid.orbitalRate
+      * simulation.timeScale
+      * asteroidBeltSettings.speedMultiplier;
     const positionIndex = index * 3;
     asteroidPositions[positionIndex] = Math.cos(asteroid.angle) * asteroid.radius;
     asteroidPositions[positionIndex + 1] = asteroid.inclination + Math.sin(asteroid.angle * 2.7) * 0.12;
@@ -862,6 +871,7 @@ function resetDefaults() {
   Object.assign(revolutionSpeeds, defaultPresets.revolutionSpeeds);
   Object.assign(planetSizes, defaultPresets.planetSizes);
   galaxySettings.rotationSpeed = 0.018;
+  asteroidBeltSettings.speedMultiplier = 1;
   updateGUIControls();
   Object.entries(orbitRadii).forEach(([planetName, radius]) => updateOrbit(planetName, radius));
   Object.entries(planetSizes).forEach(([planetName, size]) => resizePlanet(planetName, size));
@@ -894,6 +904,8 @@ function setupGUI() {
   const sizeFolder = gui.addFolder("Planet sizes");
   const galaxyFolder = gui.addFolder("Galaxy controls");
   galaxyFolder.add(galaxySettings, "rotationSpeed", 0, 1.5, 0.001).name("Spinning speed");
+  const asteroidFolder = gui.addFolder("Asteroid belt");
+  asteroidFolder.add(asteroidBeltSettings, "speedMultiplier", 0, 3, 0.01).name("Spinning speed");
 
   Object.keys(revolutionSpeeds).forEach((planetName) => {
     speedFolder.add(revolutionSpeeds, planetName, 0.001, 10, 0.001);
@@ -926,6 +938,7 @@ function updateGUIControls() {
     gui.__folders["Planet sizes"].__controllers.find((controller) => controller.property === planetName).setValue(planetSizes[planetName]);
   });
   gui.__folders["Galaxy controls"].__controllers.find((controller) => controller.property === "rotationSpeed").setValue(galaxySettings.rotationSpeed);
+  gui.__folders["Asteroid belt"].__controllers.find((controller) => controller.property === "speedMultiplier").setValue(asteroidBeltSettings.speedMultiplier);
 }
 
 async function saveToFirebase() {
@@ -935,6 +948,7 @@ async function saveToFirebase() {
       revolutionSpeeds,
       planetSizes,
       galaxySettings,
+      asteroidBeltSettings,
     });
     showToast("Simulation settings saved");
   } catch (error) {
@@ -952,6 +966,7 @@ async function loadFromFirebase() {
       Object.assign(revolutionSpeeds, data.revolutionSpeeds || {});
       Object.assign(planetSizes, data.planetSizes || {});
       Object.assign(galaxySettings, data.galaxySettings || {});
+      Object.assign(asteroidBeltSettings, data.asteroidBeltSettings || {});
       updateGUIControls();
       showToast("Simulation settings loaded");
     } else {
